@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Response } from 'express';
 import cookieparser from 'cookie-parser';
 
 import { opts, log } from './utils.js';
@@ -6,6 +6,7 @@ import getDb from './db.js';
 import login from './routes/login.js';
 import signup from './routes/signup.js';
 import todosRouter from './routes/todos/index.js';
+import type { Request } from './types.js';
 
 const app = express();
 
@@ -26,7 +27,8 @@ app.post('/login', login);
 app.post('/signup', signup);
 app.use('/todos', todosRouter);
 
-!opts.devMode && app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({ message: 'Internal Server Error' });
-});
+if (!opts.devMode)
+    app.use((err: Error, req: Request, res: Response) => {
+        console.error('Unhandled error:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    });

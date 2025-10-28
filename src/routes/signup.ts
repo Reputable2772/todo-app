@@ -18,7 +18,7 @@ export default async function signup(req: Request, res: Response) {
 
     if (!req.body || !req.body.email || !req.body.password) return res.send(401);
 
-    let { email, password } = req.body;
+    const { email, password } = req.body;
 
     const user = getUser(email);
     if (user)

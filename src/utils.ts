@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt, { type JwtPayload } from 'jsonwebtoken';
-import type { JWTPayload, User } from "./types.js";
+import type { JWTPayload, } from "./types.js";
 import { promisify } from "util";
 
 const verify = promisify(jwt.verify) as (token: string, secretOrPublicKey: string) => Promise<JwtPayload>;

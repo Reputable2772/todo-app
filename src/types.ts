@@ -33,6 +33,8 @@ export type {
 
 // Thanks https://gist.github.com/MrChocolatine/367fb2a35d02f6175cc8ccb3d3a20054
 // In TS, interfaces are "open" and can be extended
+// 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Date {
     /**
      * Give a more precise return type to the method `toISOString()`:
