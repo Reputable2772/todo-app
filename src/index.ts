@@ -28,6 +28,7 @@ app.post('/signup', signup);
 app.use('/todos', todosRouter);
 
 if (!opts.devMode)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         console.error('Unhandled error:', err);
         res.status(500).json({ message: 'Internal Server Error' });
