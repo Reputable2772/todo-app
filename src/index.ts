@@ -1,4 +1,4 @@
-import express, { type Response } from 'express';
+import express, { type NextFunction, type Response } from 'express';
 import cookieparser from 'cookie-parser';
 
 import { opts, log } from './utils.js';
@@ -28,7 +28,7 @@ app.post('/signup', signup);
 app.use('/todos', todosRouter);
 
 if (!opts.devMode)
-    app.use((err: Error, req: Request, res: Response) => {
+    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         console.error('Unhandled error:', err);
         res.status(500).json({ message: 'Internal Server Error' });
     });
