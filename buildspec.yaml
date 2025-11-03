@@ -5,6 +5,11 @@ env:
     IMAGE_REPO_NAME: "todo-app/backend-image"
 
 phases:
+  install:
+    commands:
+      - echo "Installing Linting Dependencies"
+      - npm ci
+
   pre_build:
     commands:
       - echo "Linting code"
