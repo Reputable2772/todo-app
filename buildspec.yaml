@@ -6,6 +6,8 @@ env:
 
 phases:
   install:
+    runtime-versions:
+      nodejs: latest
     commands:
       - echo "Installing Linting Dependencies"
       - npm ci
@@ -15,6 +17,7 @@ phases:
       - echo "Linting code"
       - npm run lint
       - echo "Logging in to Amazon ECR..."
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - IMAGE_TAG_SHA=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
