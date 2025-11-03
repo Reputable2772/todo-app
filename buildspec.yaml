@@ -1,0 +1,30 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_REPO_NAME: "todo-app/backend-image"
+
+phases:
+  pre_build:
+    commands:
+      - echo "Linting code"
+      - npm run lint
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - IMAGE_TAG_SHA=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo "Commit SHA Tag: $IMAGE_TAG_SHA"
+
+  build:
+    commands:
+      - echo "Building Docker image"
+      - docker build -t "$IMAGE_REPO_NAME:latest" .
+      - docker tag "$IMAGE_REPO_NAME:latest" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG_SHA"
+      - docker tag "$IMAGE_REPO_NAME:latest" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest"
+
+  post_build:
+    commands:
+      - echo "Pushing images to ECR..."
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG_SHA
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      - echo "Images pushed successfully: $IMAGE_TAG_SHA and latest"
+      - echo "Build completed on $(date)"
