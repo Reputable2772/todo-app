@@ -3,13 +3,13 @@ import type { Request, Response } from "express";
 import { getUser } from "../db.js";
 import { comparePwd, createJWT, log } from "../utils.js";
 
-export default function login(req: Request, res: Response) {
+export default async function login(req: Request, res: Response) {
     if (!req.body || !req.body.email || !req.body.password)
         return res.sendStatus(404);
 
     const { email, password } = req.body;
 
-    const user = getUser(email);
+    const user = await getUser(email);
 
     if (!user)
         return res.sendStatus(404);

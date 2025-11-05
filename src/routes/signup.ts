@@ -10,7 +10,7 @@ export default async function signup(req: Request, res: Response) {
             res.clearCookie('token');
             return;
         }
-        const db_user = getUser(user.userId);
+        const db_user = await getUser(user.userId);
 
         if (db_user)
             return res.send({ message: 'User already exists' });
@@ -20,7 +20,7 @@ export default async function signup(req: Request, res: Response) {
 
     const { email, password } = req.body;
 
-    const user = getUser(email);
+    const user = await getUser(email);
     if (user)
         return res.send({ message: 'User already exists.' });
 

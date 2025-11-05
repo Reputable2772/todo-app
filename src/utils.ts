@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import bcrypt from "bcryptjs";
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import type { JWTPayload, } from "./types.js";
@@ -9,6 +10,11 @@ const opts = {
     devMode: process.env.DEV_MODE == 'true',
     port: process.env.PORT || 8000,
     jwt_secret: process.env.JWT_SECRET || 'test',
+    db: {
+        host: process.env.DB_HOST || 'e',
+        user: process.env.DB_USER || 'e',
+        password: process.env.DB_PASSWORD || 'e',
+    },
 };
 
 const log = (type: 'ERROR' | 'WARN' | 'INFO' | 'DEBUG', log: string) => {

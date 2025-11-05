@@ -13,9 +13,12 @@ const verifyAuthenticatedReq = async (req: Request, res: Response, next: NextFun
 
     try {
         const user = await validateJWT(req.cookies.token);
-        if (!user) return res.send(404);
+        if (!user) {
+            res.clearCookie('token');
+            return res.send(404);
+        }
 
-        const updatedUser = getUser(user.userId);
+        const updatedUser = await getUser(user.userId);
         if (!updatedUser) {
             res.clearCookie('token');
             return res.sendStatus(401);
