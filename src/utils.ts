@@ -11,11 +11,17 @@ const opts = {
     port: process.env.PORT || 8000,
     jwt_secret: process.env.JWT_SECRET || 'test',
     db: {
-        host: process.env.DB_HOST || 'e',
-        user: process.env.DB_USER || 'e',
-        password: process.env.DB_PASSWORD || 'e',
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        dbname: process.env.DB_NAME,
     },
 };
+
+for (const [k, v] of Object.entries(opts.db)) {
+    if (!v)
+        throw new Error(`Database Option: ${k} not set.`);
+}
 
 const log = (type: 'ERROR' | 'WARN' | 'INFO' | 'DEBUG', log: string) => {
     if (type == 'DEBUG' && !opts.devMode) return;

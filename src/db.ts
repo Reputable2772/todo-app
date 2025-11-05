@@ -3,10 +3,10 @@ import { log, opts } from './utils.js';
 import type { Notes, User } from './types.js';
 
 const pool: Pool = mysql2.createPool({
-    host: opts.db.host,
-    user: opts.db.user,
-    password: opts.db.password,
-    database: 'todoapp',
+    host: opts.db.host as string,
+    user: opts.db.user as string,
+    password: opts.db.password as string,
+    database: opts.db.dbname as string,
     waitForConnections: true,
     connectionLimit: 10,
     maxIdle: 10,
