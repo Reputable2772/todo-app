@@ -1,6 +1,6 @@
 import mysql2, { type Pool, type RowDataPacket, type ResultSetHeader } from 'mysql2/promise';
 import { log, opts } from './utils.js';
-import type { User } from './types.js';
+import type { Notes, User } from './types.js';
 
 const pool: Pool = mysql2.createPool({
     host: opts.db.host,
@@ -15,7 +15,7 @@ const pool: Pool = mysql2.createPool({
     keepAliveInitialDelay: 0,
 });
 
-const dbRunner = async <T>(statement: string, ...params: unknown[]): Promise<T | null> => {
+const dbRunner = async <T = ResultSetHeader>(statement: string, ...params: unknown[]): Promise<T | null> => {
     if (!statement) return null;
     try {
         const [rows] = await pool.execute<RowDataPacket[] | ResultSetHeader>(statement, params);
@@ -66,9 +66,24 @@ const getUser = async (id: string | number): Promise<User | null> => {
 };
 
 const createUser = async (email: string, password: string): Promise<number | null> => {
-    const result = await dbRunner<ResultSetHeader>('INSERT INTO Users (email, password) VALUES (?, ?)', email, password);
-    return result?.insertId ?? null;
+    const result = await dbRunner('INSERT INTO Users (email, password) VALUES (?, ?)', email, password);
+    return result?.affectedRows ?? null;
 };
 
+const getNotes = async (userId: number, noteId?: number): Promise<Notes[] | []> => {
+    const rows = await dbRunner<Notes[]>(`SELECT * FROM Notes WHERE user_id = ? ${noteId ? 'AND id = ?' : ''}`, ...(noteId ? [userId, noteId] : [userId]));
+    return rows || [];
+}
+
+const createNotes = async (note: string, userId: number, completed: number = 0) => {
+    const result = await dbRunner(`INSERT INTO Notes (note, user_id, completed) VALUES (?, ?, ?)`, note, userId, completed);
+    return result?.insertId ?? null;
+}
+
+const modifyNote = async (userId: number, noteId: number, note: string, completed: number = 0) => {
+    const result = await dbRunner(`UPDATE Notes SET note = ?, completed = ? WHERE user_id = ? AND id = ?`, note, completed, userId, noteId);
+    return result?.affectedRows ?? null;
+}
+
 export default getDb;
-export { createUser, getUser };
+export { createUser, getUser, createNotes, getNotes, modifyNote };
