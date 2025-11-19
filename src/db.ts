@@ -46,17 +46,17 @@ await dbRunner(`
 	)
 `);
 
-await pool.query('DROP TRIGGER IF EXISTS update_last_modified');
-await pool.query(`
-	CREATE TRIGGER update_last_modified
-	BEFORE UPDATE ON Notes
-	FOR EACH ROW
-	BEGIN
-		IF NEW.note <> OLD.note OR NEW.completed <> OLD.completed THEN
-			SET NEW.last_modified_at = CURRENT_TIMESTAMP;
-		END IF;
-	END
-`);
+// await pool.query('DROP TRIGGER IF EXISTS update_last_modified');
+// await pool.query(`
+// 	CREATE TRIGGER update_last_modified
+// 	BEFORE UPDATE ON Notes
+// 	FOR EACH ROW
+// 	BEGIN
+// 		IF NEW.note <> OLD.note OR NEW.completed <> OLD.completed THEN
+// 			SET NEW.last_modified_at = CURRENT_TIMESTAMP;
+// 		END IF;
+// 	END
+// `);
 
 const getDb = (): Pool => pool;
 
