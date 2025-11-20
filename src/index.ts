@@ -4,6 +4,7 @@ import cookieparser from 'cookie-parser';
 import { opts, log } from './utils.js';
 import getDb from './db.js';
 import login from './routes/login.js';
+import logout from './routes/logout.js';
 import signup from './routes/signup.js';
 import todosRouter from './routes/todos/index.js';
 import type { Request } from './types.js';
@@ -24,6 +25,7 @@ app.listen(opts.port, () => {
 });
 
 app.post('/login', login);
+app.post('/logout', logout);
 app.post('/signup', signup);
 app.use('/todos', todosRouter);
 
