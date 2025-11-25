@@ -21,7 +21,8 @@ export default async function login(req: Request, res: Response) {
 
     res.cookie('token', token, {
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'none',
+        secure: true,
     });
 
     log('DEBUG', `${email} User logged in.`);

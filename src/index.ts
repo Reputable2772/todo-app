@@ -1,5 +1,6 @@
 import express, { type NextFunction, type Response } from 'express';
 import cookieparser from 'cookie-parser';
+import cors from 'cors';
 
 import { opts, log } from './utils.js';
 import getDb from './db.js';
@@ -11,6 +12,12 @@ import type { Request } from './types.js';
 
 const app = express();
 
+app.use(cors({
+    origin(requestOrigin, callback) {
+        if (!requestOrigin) return callback(null, true);
+        else callback(null, false);
+    },
+}));
 app.use(express.json());
 app.use(cookieparser());
 
