@@ -75,7 +75,7 @@ const getNotes = async (userId: number, noteId?: number): Promise<Notes[] | []> 
     return rows || [];
 }
 
-const createNotes = async (note: string, userId: number, completed: number = 0) => {
+const createNote = async (userId: number, note: string, completed: number = 0) => {
     const result = await dbRunner(`INSERT INTO Notes (note, user_id, completed) VALUES (?, ?, ?)`, note, userId, completed);
     return result?.insertId ?? null;
 }
@@ -85,5 +85,10 @@ const modifyNote = async (userId: number, noteId: number, note: string, complete
     return result?.affectedRows ?? null;
 }
 
+const deleteNote = async (userId: number, noteId: number) => {
+    const result = await dbRunner(`DELETE FROM Notes WHERE user_id = ? AND id = ?`, userId, noteId);
+    return result?.affectedRows ?? null;
+}
+
 export default getDb;
-export { createUser, getUser, createNotes, getNotes, modifyNote };
+export { createUser, getUser, createNote, getNotes, modifyNote, deleteNote };
