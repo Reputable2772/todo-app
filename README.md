@@ -1,0 +1,118 @@
+# Todo App
+
+A simple cloud-hosted Todo application with a lightweight frontend and a fully containerized backend, designed as a playground for cloud infrastructure, CI/CD, and AWS services.
+
+---
+
+## 💡 Overview
+
+This project provides basic todo functionality with a minimal static frontend and a backend API service.  
+The primary focus of the project is reliable backend design, deployment automation, and cloud infrastructure learning.
+
+---
+
+## 🏗️ Architecture
+
+**Core Components**
+- Backend: Node.js, Express
+- Database: Amazon Aurora (MySQL compatible)
+- Containerization: Docker / OCI image stored in Amazon ECR
+- Deployment: Amazon ECS Fargate
+- Load Balancing: Application Load Balancer (ALB)
+- CI/CD: AWS CodePipeline + CodeBuild
+- DNS: Cloudflare
+
+**Flow**
+1. Code is pushed to repository  
+2. CI builds backend image and pushes it to ECR  
+3. CodePipeline deploys to ECS Fargate  
+4. ALB routes traffic to running tasks  
+5. Database persists application data  
+
+---
+
+## 🚀 Features
+- Create and manage todos
+- RESTful API backend
+- Cloud-native deployment
+- Fully automated CI/CD pipeline
+- Production-ready networking setup
+
+---
+
+## 🧑‍💻 Local Development
+
+### Prerequisites
+- Node.js  
+- npm  
+- Docker (if you want to mirror container behavior)
+- MySQL or a local equivalent (if testing DB locally)
+- Nix (optional)
+
+### Setup
+1. Clone the GitHub repository, and navigate into it.
+2. Run `npm install`
+3. Rename `.env.example` to `.env` (and look at [Environment](#environment))
+4. For developing, run `npx nodemon`
+5. For production, 
+```
+docker build -t todo-app .
+docker run -p 3000:3000 --env-file .env todo-app
+```
+
+
+## Environment
+All the variables from `.env` are documented here -
+- DB_HOST - IP address of system hosting the database (MySQL or any compatible one)
+- DB_NAME - Name of database where todos are to be written into
+- DB_USER - Username of user accessing the database
+- DB_PASSWORD - Password for user
+
+All the above variables are **required**
+
+Some other optional environment variables are -
+- JWT_SECRET - Secret to be used for the JSON Web Token
+- DEV_MODE - Whether to enable verbose logging (off, by default)
+- PORT - Port number on which backend runs (3000, by default)
+
+## API Documentation
+
+### Auth
+POST /signup
+POST /login
+POST /logout
+
+### Todos
+POST /todos/create
+Body: 
+```
+{
+    "note": "note 1",
+    "completed": 1
+}
+```
+DELETE /todos/delete/:id
+GET /todos/list
+GET /todos/:id
+POST /todos/modify/:id
+Body:
+```
+{
+    "id": 1,
+    "note": "Test",
+    "completed": 1
+}
+```
+Note: Updates use POST /todos/modify/:id instead of PUT/PATCH to simplify handler structure and reduce development effort. This was a conscious design choice for a learning project.
+
+## Limitations
+- Basic UI/UX
+- No performance or scalability testing
+- Vendor lock-in to AWS
+- No uptime guarantees
+- No rate limiting
+
+## Status
+The hosted deployment has been intentionally taken offline to avoid ongoing AWS infrastructure costs.
+
+Licensed under MIT, 2025.
