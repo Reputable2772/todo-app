@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes App Demo</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #f3f4f6;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #111827;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0;
+            font-size: 1rem;
+        }
+
+        input {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary {
+            background: #6b7280;
+        }
+
+        .secondary:hover {
+            background: #4b5563;
+        }
+
+        ol {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        li {
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 25px 0;
+        }
+
+        .label {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .completed {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Login / Signup</h2>
+
+        <input placeholder="Email" id="email" type="email">
+        <input placeholder="Password" id="password" type="password">
+
+        <button onclick="login()">Login</button>
+        <button class="secondary" onclick="signup()">Signup</button>
+
+        <div class="divider"></div>
+
+        <h2>Your Notes</h2>
+        <button onclick="getNotes()">Refresh Notes</button>
+
+        <ol id="notes"></ol>
+
+        <div class="divider"></div>
+
+        <h2>Create / Update Note</h2>
+
+        <div class="label">Leave ID empty to create a new note</div>
+        <input type="number" id="noteid" placeholder="Note ID">
+        <input type="text" id="note" placeholder="Note Text"><br>
+
+        <label class="completed">
+            <input type="checkbox" id="notecompleted"> Completed
+        </label>
+
+        <button onclick="crudNote()">Save Note</button>
+    </div>
+
+    <script>
+        let notes = [];
+        const domain = "https://INSERT_YOUR_DOMAIN_HERE";
+
+        function login() {
+            const email = value("email");
+            const password = value("password");
+
+            if (!email || !password) return alert("Enter email and password");
+
+            fetch(domain + "/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ email, password })
+            }).then(r => alert(r.status === 200 ? "Logged in!" : "Error logging in."));
+        }
+
+        function signup() {
+            const email = value("email");
+            const password = value("password");
+
+            if (!email || !password) return alert("Enter email and password");
+
+            fetch(domain + "/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ email, password })
+            }).then(r => alert(r.status === 200 ? "Signed up!" : "Error signing up."));
+        }
+
+        function getNotes() {
+            fetch(domain + "/todos/list", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            })
+                .then(r => r.json())
+                .then(data => {
+                    notes = data;
+                    const ol = document.getElementById("notes");
+                    ol.innerHTML = "";
+
+                    data.forEach(n => {
+                        const li = document.createElement("li");
+                        li.textContent = `${n.completed ? "✅" : "❌"} ${n.note} (ID: ${n.id})`;
+                        li.onclick = () => {
+                            document.getElementById("noteid").value = n.id;
+                            document.getElementById("note").value = n.note;
+                            document.getElementById("notecompleted").checked = n.completed == 1;
+                        };
+                        ol.appendChild(li);
+                    });
+                })
+                .catch(() => alert("Failed to load notes"));
+        }
+
+        function crudNote() {
+            const id = value("noteid");
+            const note = value("note");
+            const completed = document.getElementById("notecompleted").checked ? 1 : 0;
+
+            if (!note) return alert("Enter note text");
+
+            // Create
+            if (!id) {
+                return fetch(domain + "/todos/create", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ note, completed })
+                }).then(() => {
+                    getNotes();
+                    alert("Note created!");
+                });
+            }
+
+            // Update
+            fetch(domain + "/todos/modify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ id, note, completed })
+            }).then(() => {
+                getNotes();
+                alert("Note updated!");
+            });
+        }
+
+        function value(id) {
+            return document.getElementById(id).value.trim();
+        }
+    </script>
+
+</body>
+
+</html>
