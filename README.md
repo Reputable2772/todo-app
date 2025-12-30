@@ -78,32 +78,91 @@ Some other optional environment variables are -
 ## API Documentation
 
 ### Auth
-POST /signup
-POST /login
-POST /logout
+POST /signup  
+Body:
+```json
+{
+    "email": "test@gmail.com",
+    "password": "test.com"
+}
+```
+POST /login  
+Body:
+```json
+{
+    "email": "test@gmail.com",
+    "password": "test.com"
+}
+```
+POST /logout  
+No body
 
 ### Todos
-POST /todos/create
+POST /todos/create  
 Body: 
-```
+```json
 {
     "note": "note 1",
     "completed": 1
 }
 ```
-DELETE /todos/delete/:id
-GET /todos/list
-GET /todos/:id
-POST /todos/modify/:id
+POST /todos/modify/:id  
 Body:
-```
+```json
 {
     "id": 1,
     "note": "Test",
     "completed": 1
 }
 ```
+DELETE /todos/delete/:id  
+GET /todos/list  
+GET /todos/:id  
+
 Note: Updates use POST /todos/modify/:id instead of PUT/PATCH to simplify handler structure and reduce development effort. This was a conscious design choice for a learning project.
+
+## Architecture Diagram
+
+```mermaid
+graph TD
+
+User["User Browser"]
+Frontend["Static Frontend (index.html)"]
+Cloudflare["Cloudflare DNS"]
+ALB["Application Load Balancer"]
+ECS["ECS Fargate Service (Node.js + Express)"]
+DB["Amazon Aurora MySQL"]
+ECR["Amazon ECR (Container Registry)"]
+
+User --> Frontend
+Frontend --> ALB
+Cloudflare --> ALB
+ALB --> ECS
+ECS --> DB
+ECR --> ECS
+```
+
+## CI/CD Flow
+
+```mermaid
+graph TD
+
+Dev["Developer Pushes Code"]
+GitHub["GitHub Repository"]
+CodePipeline["AWS CodePipeline"]
+CodeBuild["AWS CodeBuild (Build + Test)"]
+ECR["Amazon ECR"]
+ECS["ECS Fargate Deployment"]
+ALB["Application Load Balancer"]
+
+Dev --> GitHub
+GitHub --> CodePipeline
+CodePipeline --> CodeBuild
+CodeBuild --> ECR
+CodePipeline --> ECS
+ECS --> ALB
+```
+
 
 ## Limitations
 - Basic UI/UX
