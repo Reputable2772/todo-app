@@ -36,7 +36,8 @@ The primary focus of the project is reliable backend design, deployment automati
 - RESTful API backend
 - Cloud-native deployment
 - Fully automated CI/CD pipeline
-- Production-ready networking setup
+- Production-style networking setup
+- Uses ALB health checks and stateless containers for safe redeployments
 
 ---
 
@@ -163,6 +164,19 @@ CodePipeline --> ECS
 ECS --> ALB
 ```
 
+## Design Choices
+- Amazon ECR was used instead of a third-party Docker registry for tighter integration with AWS IAM and ECS.
+- ECS Fargate was chosen over EC2 to avoid instance management and simplify container orchestration for a stateless backend.
+- An Application Load Balancer (ALB) was used to route traffic to running ECS tasks and perform health checks.
+- Aurora MySQL was selected to use a managed relational database with automated backups and scaling, without manual database administration.
+
+## Reproducibility & Infrastructure Lifecycle
+- Infrastructure was intentionally provisioned and later decommissioned as part of cost-aware cloud usage.
+- The application backend is stateless and containerized, enabling clean redeployments.
+- CI/CD pipelines and container images are defined to support repeatable deployments.
+
+## Cost Considerations
+- Infrastructure was sized conservatively and decommissioned when not in use to avoid unnecessary cloud spend.
 
 ## Limitations
 - Basic UI/UX
@@ -170,8 +184,12 @@ ECS --> ALB
 - Vendor lock-in to AWS
 - No uptime guarantees
 - No rate limiting
+- No IaC for easy redeployment (yet)
 
 ## Status
-The hosted deployment has been intentionally taken offline to avoid ongoing AWS infrastructure costs.
+This application was previously deployed end-to-end on AWS using ECS Fargate, ALB, and Aurora MySQL.
+
+The infrastructure was intentionally decommissioned to manage AWS usage costs and credits.  
+The system is designed to be stateless and reproducible, and can be redeployed using the existing source code and configuration when required.
 
 Licensed under MIT, 2025.
